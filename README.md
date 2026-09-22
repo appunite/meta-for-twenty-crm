@@ -1,4 +1,4 @@
-# Meta Leads
+# Meta for Twenty CRM
 
 Brings leads from Facebook and Instagram instant forms into Twenty as People, in real time, with the full form submission kept alongside.
 
