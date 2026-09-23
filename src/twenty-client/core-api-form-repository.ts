@@ -28,7 +28,9 @@ export class CoreApiFormRepository implements FormRepository {
       },
     });
 
-    return (result.metaLeadForms?.edges ?? []).map(({ node }) => ({
+    type FormEdge = NonNullable<typeof result.metaLeadForms>['edges'][number];
+
+    return (result.metaLeadForms?.edges ?? []).map(({ node }: FormEdge) => ({
       formId: node.formId ?? '',
       pageId: node.pageId ?? '',
       lastSyncedAt: node.lastSyncedAt ?? null,

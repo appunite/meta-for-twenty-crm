@@ -147,7 +147,9 @@ describe('CoreApiLeadRepository', () => {
       },
     });
 
-    expect(stored.metaLeads?.edges.map((edge) => edge.node)).toEqual([
+    type LeadEdge = NonNullable<typeof stored.metaLeads>['edges'][number];
+
+    expect(stored.metaLeads?.edges.map((edge: LeadEdge) => edge.node)).toEqual([
       {
         personId,
         platform: MetaLeadPlatform.INSTAGRAM,

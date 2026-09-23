@@ -60,11 +60,13 @@ const loadLeadStats = async (): Promise<LeadStats> => {
     total: all.metaLeads?.totalCount ?? 0,
     failed: failed.metaLeads?.totalCount ?? 0,
     lastReceivedAt: all.metaLeads?.edges[0]?.node.createdAt ?? null,
-    recentFailures: (failed.metaLeads?.edges ?? []).map(({ node }) => ({
-      id: node.id,
-      name: node.name ?? '',
-      errorMessage: node.errorMessage ?? '',
-    })),
+    recentFailures: (failed.metaLeads?.edges ?? []).map(
+      ({ node }: NonNullable<typeof failed.metaLeads>['edges'][number]) => ({
+        id: node.id,
+        name: node.name ?? '',
+        errorMessage: node.errorMessage ?? '',
+      }),
+    ),
   };
 };
 
