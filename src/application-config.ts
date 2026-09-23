@@ -16,6 +16,11 @@ export default defineApplication({
   universalIdentifier: APPLICATION_UNIVERSAL_IDENTIFIER,
   displayName: APP_DISPLAY_NAME,
   description: APP_DESCRIPTION,
+  author: 'Appunite',
+  category: 'Marketing',
+  logo: 'public/logo.svg',
+  emailSupport: 'hello@appunite.com',
+  issueReportUrl: 'https://github.com/twentyhq/twenty/discussions/23921',
   applicationVariables: {
     META_APP_SECRET: {
       universalIdentifier: META_APP_SECRET_VARIABLE_UNIVERSAL_IDENTIFIER,

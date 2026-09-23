@@ -1,6 +1,6 @@
 # Meta Leads
 
-A Twenty CRM app that imports leads from Meta Lead Ads (Facebook and Instagram instant forms) into Twenty. Each submission becomes a `MetaLead` record linked to a matching or newly created Person. Published to npm as `meta-leads`.
+A Twenty CRM app that imports leads from Meta Lead Ads (Facebook and Instagram instant forms) into Twenty. Each submission becomes a `MetaLead` record linked to a matching or newly created Person. Published to npm as `@appunite/meta-leads-for-twenty`.
 
 - `README.md` is the marketplace listing. The build copies it into the manifest's `aboutDescription`, so write it for customers, not developers.
 - `SETUP.md` is the setup guide for non-technical operators: click paths in Meta's web tools, no code.

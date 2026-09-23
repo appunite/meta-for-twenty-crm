@@ -15,6 +15,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@appunite/meta-leads-for-twenty@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@appunite/meta-leads-for-twenty@workspace:."
+  dependencies:
+    "@types/node": "npm:^24.7.2"
+    "@types/react": "npm:^19.0.0"
+    "@typescript/native-preview": "npm:^7.0.0-dev.20260116.1"
+    libphonenumber-js: "npm:^1.13.13"
+    oxlint: "npm:^0.16.0"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
+    twenty-client-sdk: "npm:2.39.0"
+    twenty-sdk: "npm:2.39.0"
+    twenty-ui: "npm:1.0.0-alpha.1"
+    typescript: "npm:^5.9.3"
+    vite-tsconfig-paths: "npm:^4.2.1"
+    vitest: "npm:^4.0.0"
+  languageName: unknown
+  linkType: soft
+
 "@babel/runtime@npm:^7.29.7":
   version: 7.29.7
   resolution: "@babel/runtime@npm:7.29.7"
@@ -2290,26 +2310,6 @@ __metadata:
   checksum: 10c0/7579ff94e899e2f76ab64491d76cf606274c874d8f2af4a442c016bd85688927fcfca157ba6bf74b08e9439dc010b248ce05b96cc7c126a354c3bae7fcb48b7f
   languageName: node
   linkType: hard
-
-"meta-leads@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "meta-leads@workspace:."
-  dependencies:
-    "@types/node": "npm:^24.7.2"
-    "@types/react": "npm:^19.0.0"
-    "@typescript/native-preview": "npm:^7.0.0-dev.20260116.1"
-    libphonenumber-js: "npm:^1.13.13"
-    oxlint: "npm:^0.16.0"
-    react: "npm:^19.0.0"
-    react-dom: "npm:^19.0.0"
-    twenty-client-sdk: "npm:2.39.0"
-    twenty-sdk: "npm:2.39.0"
-    twenty-ui: "npm:1.0.0-alpha.1"
-    typescript: "npm:^5.9.3"
-    vite-tsconfig-paths: "npm:^4.2.1"
-    vitest: "npm:^4.0.0"
-  languageName: unknown
-  linkType: soft
 
 "mime-db@npm:1.52.0":
   version: 1.52.0

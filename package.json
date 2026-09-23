@@ -1,7 +1,8 @@
 {
-  "name": "meta-leads",
-  "version": "0.1.0",
+  "name": "@appunite/meta-leads-for-twenty",
+  "version": "1.0.0",
   "license": "MIT",
+  "author": "Appunite",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/appunite/meta-for-twenty-crm.git"
@@ -17,7 +18,12 @@
     "twenty": ">=2.39.0"
   },
   "keywords": [
-    "twenty-app"
+    "twenty-app",
+    "meta",
+    "leads",
+    "twenty crm",
+    "twenty",
+    "ads"
   ],
   "packageManager": "yarn@4.13.0",
   "scripts": {
