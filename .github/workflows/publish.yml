@@ -41,6 +41,10 @@ jobs:
         # Trusted publishing requires npm 11.5.1 or later.
         run: npm install -g npm@latest
 
+      - name: Enable Corepack
+        # Activates the Yarn version pinned in package.json's "packageManager" field.
+        run: corepack enable
+
       - name: Install dependencies
         run: yarn install --immutable
 
