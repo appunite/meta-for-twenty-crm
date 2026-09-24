@@ -28,6 +28,14 @@ You connect your own Meta app, so your lead data goes straight from Meta to your
 
 The app stores the answers and consent responses a person submitted in a Meta instant form, plus ad and campaign identifiers. It does not send data back to Meta. As the owner of the Meta app you are responsible for its privacy policy and data deletion instructions.
 
+## Want your Growth operating system built around your team?
+
+This app is one piece. Appunite designs and builds the rest: ads, forms, enrichment, routing and reporting, connected to Twenty and shaped around how your team sells.
+
+Since 2010, Appunite builds custom software and AI solutions for mid-size and growth-stage companies.
+
+[Talk to us](https://www.appunite.com/get-in-touch)
+
 ## Changelog
 
 Notable changes are documented in [CHANGELOG.md](CHANGELOG.md).
