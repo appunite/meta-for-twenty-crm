@@ -30,9 +30,11 @@ The app stores the answers and consent responses a person submitted in a Meta in
 
 ## Want your Growth operating system built around your team?
 
-This app is one piece. Appunite designs and builds the rest: ads, forms, enrichment, routing and reporting, connected to Twenty and shaped around how your team sells.
+This app is one piece. Appunite can design and build the rest: enrichment, routing and reporting, connected to Twenty and shaped around how your team sells.
 
-Since 2010, Appunite builds custom software and AI solutions for mid-size and growth-stage companies.
+A custom Growth operating system tailored to your needs.
+
+Since 2010, Appunite has been a technological partner for domain leaders. We've been building custom software and AI solutions for all types of companies. From mid-size growth-stage to enterprises.
 
 [Talk to us](https://www.appunite.com/get-in-touch)
 
