@@ -9,17 +9,21 @@ import {
   navigate,
   useColorScheme,
 } from 'twenty-sdk/front-component';
+import { IconEye, IconEyeOff } from 'twenty-ui/icon';
 import { THEME_DARK, THEME_LIGHT } from 'twenty-ui/theme';
 
 import {
+  CONNECT_PATH,
   CONNECTION_STATUS_PATH,
   META_WEBHOOK_PATH,
 } from 'src/constants/logic-function-universal-identifiers';
+import { type ConnectRequest } from 'src/logic-functions/connect';
 import {
   APP_DISPLAY_NAME,
   MAIN_PAGE_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
 import { type ConnectionStatus } from 'src/utils/check-connection';
+import { type ConnectResult, type ConnectStep } from 'src/utils/connect-meta';
 import { connectionIssues } from 'src/utils/connection-issues';
 
 type FailedLead = { id: string; name: string; errorMessage: string };
@@ -117,7 +121,198 @@ const buildStyles = (theme: Theme): Record<string, CSSProperties> => ({
     cursor: 'pointer',
   },
   link: { color: theme.font.color.secondary, alignSelf: 'flex-start' },
+  input: {
+    flex: 1,
+    fontFamily: 'monospace',
+    fontSize: '13px',
+    padding: '6px 8px',
+    borderRadius: theme.border.radius.sm,
+    border: `1px solid ${theme.border.color.medium}`,
+    background: theme.background.primary,
+    color: theme.font.color.primary,
+  },
+  label: { fontWeight: 600 },
+  iconButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '6px',
+    borderRadius: theme.border.radius.sm,
+    border: `1px solid ${theme.border.color.strong}`,
+    background: theme.background.primary,
+    color: theme.font.color.secondary,
+    cursor: 'pointer',
+  },
 });
+
+const STEP_ICONS: Record<ConnectStep['status'], string> = {
+  ok: '✓',
+  warning: '!',
+  failed: '✗',
+};
+
+const stepStyle = (
+  status: ConnectStep['status'],
+  styles: Record<string, CSSProperties>,
+) => (status === 'ok' ? styles.ok : status === 'warning' ? styles.warning : styles.danger);
+
+const copyValue = async (value: string, message: string) => {
+  await copyToClipboard(value);
+  await enqueueSnackbar({ message, variant: 'success' });
+};
+
+const ConnectSection = ({ styles }: { styles: Record<string, CSSProperties> }) => {
+  const [userToken, setUserToken] = useState('');
+  const [callbackUrl, setCallbackUrl] = useState('');
+  const [result, setResult] = useState<ConnectResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isTokenVisible, setIsTokenVisible] = useState(false);
+
+  const connect = async (pageId?: string) => {
+    setIsConnecting(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const request: ConnectRequest = {
+        userToken,
+        ...(pageId ? { pageId } : {}),
+        ...(callbackUrl.trim() ? { callbackUrl: callbackUrl.trim() } : {}),
+      };
+      const next = await new RestApiClient().post<ConnectResult>(
+        `/s${CONNECT_PATH}`,
+        request,
+      );
+
+      setResult(next);
+      setIsTokenVisible(false);
+
+      if (next.connection) {
+        setUserToken('');
+      }
+    } catch (connectError) {
+      setError(connectError instanceof Error ? connectError.message : String(connectError));
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const connection = result?.connection;
+
+  return (
+    <section style={styles.section}>
+      <h2 style={styles.heading}>Connect with a Meta token</h2>
+      <span style={styles.muted}>
+        Paste your User token and click Connect. Twenty checks the token, links your
+        Page to Twenty and shows two values to copy into the app settings.
+      </span>
+      <span style={styles.muted}>
+        You generate the token on developers.facebook.com/tools/explorer. After you
+        click Generate Access Token and allow your Page, it sits in the Access token
+        box on that page. Save the Meta app secret in the app settings before you
+        connect. The setup guide walks you through it.
+      </span>
+      <div style={styles.row}>
+        <input
+          type="password"
+          autoComplete="off"
+          placeholder="User token"
+          style={styles.input}
+          value={userToken}
+          onChange={(event) => setUserToken(event.target.value)}
+        />
+        <button
+          style={styles.button}
+          disabled={isConnecting || userToken.trim().length === 0}
+          onClick={() => void connect()}
+        >
+          {isConnecting ? 'Connecting…' : 'Connect'}
+        </button>
+      </div>
+      <details>
+        <summary style={styles.muted}>Behind a tunnel? Use a different callback URL</summary>
+        <div style={{ ...styles.row, marginTop: '8px' }}>
+          <input
+            type="url"
+            placeholder="https://your-tunnel.example.com"
+            style={styles.input}
+            value={callbackUrl}
+            onChange={(event) => setCallbackUrl(event.target.value)}
+          />
+        </div>
+      </details>
+      {error ? <span style={styles.danger}>{error}</span> : null}
+      {result?.steps.map((step) => (
+        <span key={step.id}>
+          <span style={stepStyle(step.status, styles)}>{STEP_ICONS[step.status]}</span>{' '}
+          {step.label}
+          {step.detail ? <span style={styles.muted}>: {step.detail}</span> : null}
+        </span>
+      ))}
+      {result?.pages ? (
+        <div style={{ ...styles.row, flexWrap: 'wrap' }}>
+          {result.pages.map((page) => (
+            <button
+              key={page.id}
+              style={styles.button}
+              disabled={isConnecting}
+              onClick={() => void connect(page.id)}
+            >
+              {page.name} ({page.id})
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {connection ? (
+        <>
+          <span>
+            Paste these two values into Settings, Applications, Meta Leads, then click
+            Check again.
+          </span>
+          <span style={styles.label}>Facebook Page ID</span>
+          <div style={styles.row}>
+            <code style={styles.code}>{connection.pageId}</code>
+            <button
+              style={styles.button}
+              onClick={() => void copyValue(connection.pageId, 'Page ID copied')}
+            >
+              Copy
+            </button>
+          </div>
+          <span style={styles.label}>Page access token</span>
+          <div style={styles.row}>
+            <code style={styles.code}>
+              {isTokenVisible ? connection.pageAccessToken : '•'.repeat(32)}
+            </code>
+            <button
+              style={styles.iconButton}
+              title={isTokenVisible ? 'Hide token' : 'Show token'}
+              aria-label={isTokenVisible ? 'Hide token' : 'Show token'}
+              onClick={() => setIsTokenVisible((visible) => !visible)}
+            >
+              {isTokenVisible ? <IconEyeOff size={16} /> : <IconEye size={16} />}
+            </button>
+            <button
+              style={styles.button}
+              onClick={() =>
+                void copyValue(connection.pageAccessToken, 'Page access token copied')
+              }
+            >
+              Copy
+            </button>
+          </div>
+          <span style={styles.muted}>
+            Treat the token like a password. It does not expire.
+          </span>
+          <a href="/settings/applications#installed" style={styles.link}>
+            Open app settings
+          </a>
+        </>
+      ) : null}
+    </section>
+  );
+};
 
 const formatDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString() : 'never';
@@ -185,11 +380,6 @@ const StatusPage = () => {
     void load();
   }, [load]);
 
-  const copyCallbackUrl = async () => {
-    await copyToClipboard(callbackUrl);
-    await enqueueSnackbar({ message: 'Callback URL copied', variant: 'success' });
-  };
-
   return (
     <div style={styles.page}>
       <div>
@@ -202,16 +392,18 @@ const StatusPage = () => {
       <section style={styles.section}>
         <h2 style={styles.heading}>Webhook</h2>
         <span style={styles.muted}>
-          Paste this callback URL and your verify token into the Meta app
-          (Webhooks, Page, leadgen).
+          Connect below registers this address with Meta for you. To do it by hand,
+          paste it and your verify token into the Meta app (Webhooks, Page, leadgen).
         </span>
         <div style={styles.row}>
           <code style={styles.code}>{callbackUrl}</code>
-          <button style={styles.button} onClick={() => void copyCallbackUrl()}>
+          <button style={styles.button} onClick={() => void copyValue(callbackUrl, 'Callback URL copied')}>
             Copy
           </button>
         </div>
       </section>
+
+      <ConnectSection styles={styles} />
 
       <section style={styles.section}>
         <div style={styles.spread}>

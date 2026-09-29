@@ -20,8 +20,14 @@ const pageIssues = (page: PageStatus): string[] => {
   ];
 };
 
+// Without a stored verify token the webhook accepts one derived from the app secret
+const isMissing = (
+  variables: ConnectionStatus['variables'],
+  key: keyof ConnectionStatus['variables'],
+) => !variables[key] && !(key === 'verifyToken' && variables.appSecret);
+
 export const connectionIssues = (status: ConnectionStatus): string[] => [
-  ...MISSING_VARIABLE_ISSUES.filter(([key]) => !status.variables[key]).map(
+  ...MISSING_VARIABLE_ISSUES.filter(([key]) => isMissing(status.variables, key)).map(
     ([, issue]) => issue,
   ),
   ...(status.page ? pageIssues(status.page) : []),
