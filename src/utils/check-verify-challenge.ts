@@ -2,15 +2,17 @@ export type VerifyChallengeResult = { status: 200 | 400 | 403; body: string };
 
 export const checkVerifyChallenge = ({
   query,
-  verifyToken,
+  acceptedTokens,
 }: {
   query: Record<string, string | undefined>;
-  verifyToken: string | undefined;
+  acceptedTokens: string[];
 }): VerifyChallengeResult => {
+  const token = query['hub.verify_token'];
+
   if (
-    !verifyToken ||
+    !token ||
     query['hub.mode'] !== 'subscribe' ||
-    query['hub.verify_token'] !== verifyToken
+    !acceptedTokens.includes(token)
   ) {
     return { status: 403, body: 'Forbidden' };
   }

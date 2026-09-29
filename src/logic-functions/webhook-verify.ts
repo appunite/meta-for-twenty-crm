@@ -6,11 +6,12 @@ import {
   WEBHOOK_VERIFY_LOGIC_FUNCTION_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/logic-function-universal-identifiers';
 import { checkVerifyChallenge } from 'src/utils/check-verify-challenge';
+import { acceptedVerifyTokens } from 'src/utils/derive-verify-token';
 
 const handler = (payload: RoutePayload) => {
   const { status, body } = checkVerifyChallenge({
     query: payload.queryStringParameters ?? {},
-    verifyToken: process.env.META_VERIFY_TOKEN,
+    acceptedTokens: acceptedVerifyTokens(process.env),
   });
 
   return new Response(body, {

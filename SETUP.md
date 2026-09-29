@@ -31,6 +31,22 @@ Steps 1 to 4 set up the things you need. Steps 5 to 12 connect them to Twenty.
 
 One Twenty workspace connects one Facebook Page. If you collect leads on two Pages, you need two Twenty workspaces.
 
+### The shortcut: the Connect button
+
+The **Status** page in Twenty has a **Connect** button that does the fiddliest part of this guide for you. You still create a token in step 7, but you paste it into Twenty instead of working with it in Meta's tools. Twenty then checks it, links your Page to Twenty, and shows you the two values to copy into the app settings. The token it gives you never expires.
+
+With the Connect button:
+
+- Steps 1 to 5 stay the same, except that you save the App secret in Twenty at the end of step 5.
+- Step 6 can be skipped. Connect tells you if a permission is missing.
+- Step 7 gets shorter: only points 1 to 6.
+- Step 8 gets shorter: two values to paste. You can leave the verify token empty.
+- Step 9 can be skipped, apart from clicking **Check again**.
+- Steps 10 to 12 stay the same.
+- Appendix A can be skipped.
+
+Each of those steps has a short note at the top saying what to do. The rest of each step describes the manual way, which keeps working if you prefer it.
+
 ## Step 1. Create your Facebook Page
 
 Skip this if you already have a Page and you are an admin of it.
@@ -103,7 +119,11 @@ A few other things worth knowing:
 
 Nobody outside your company ever sees this app. It exists only so that Twenty may read your leads.
 
+> **Planning to use the Connect button in step 7?** Put the App secret into Twenty now, rather than in step 8. Open **Settings**, then **Applications**, then **Meta Leads**, paste it into the **Meta app secret** box and save. Connect needs it.
+
 ## Step 6. What your app is allowed to do
+
+> **Using the Connect button in step 7?** It checks these permissions for you and names any that are missing.
 
 **You can skip this step.** Because you chose the lead ads use case in step 5, Meta grants everything needed for your own Page automatically. Read this only if something fails later, or if you like knowing what you agreed to.
 
@@ -127,6 +147,12 @@ These are the permissions involved. You do not tick them here, you tick them in 
 Either way, **Standard access** or **Ready for testing** next to a permission means you are fine. You do not need to submit anything for review. App Review only comes up if you ever want to read leads from a Page owned by a different company.
 
 ## Step 7. Get your Page token
+
+> **The quicker way: the Connect button.** Do points 1 to 6 below. Then, instead of point 7, click the copy icon next to the **Access token** box, which now holds your User token. In Twenty, open **Lead Ads**, then **Status**, paste the token into the box under **Connect with a Meta token** and click **Connect**. If Twenty lists several Pages, click yours.
+>
+> Twenty shows a line with a tick for each thing it did. When it is done, it shows your **Facebook Page ID** and a **Page access token** that never expires, each with a **Copy** button. Keep that page open for step 8, and skip the rest of this step: point 7, "The reliable way", the token check and "Find your Page ID".
+>
+> If a line shows a cross, it says what to fix. Fix it and click **Connect** again.
 
 This step uses a Meta tool called the **Graph API Explorer**. It is still a web page with dropdowns, but **the order matters**. Doing it in the wrong order is why the Page token option often appears to do nothing.
 
@@ -178,6 +204,10 @@ Treat the token like a password. It can read every lead your Page has ever colle
 
 In Twenty, open **Settings**, then **Applications**, then **Meta Leads**, and fill in four boxes.
 
+> **Used the Connect button?** You already saved the Meta app secret in step 5. Paste the **Page access token** and the **Facebook Page ID** that Connect showed you.
+>
+> You can leave **Webhook verify token** empty. Connect makes its own verify token from the app secret and hands it to Meta, so you never see it and there is nothing to copy. If the box already has text in it, leave it there, both keep working. You only need to fill it in if you ever connect Meta by hand in step 9, points 1 to 4.
+
 | Box | What to put in it |
 |---|---|
 | Meta app secret | The App secret from step 5 |
@@ -190,6 +220,8 @@ Save. Twenty hides the three secret values from now on and shows dots instead, s
 ## Step 9. Connect the two sides
 
 Now you tell Meta where to send leads.
+
+> **Used the Connect button, and every line showed a tick?** Connect has already done points 1 to 5 for you. Only do point 6.
 
 1. In Twenty, open **Lead Ads**, then **Status**. At the top is a web address called the **callback URL**. Click **Copy**.
 2. In the Meta app dashboard, find **Webhooks** in the left menu. Choose **Page** from the dropdown and click **Subscribe to this object**.
@@ -262,10 +294,15 @@ Twenty shows the reason on each failed lead, and on the Status page. Here is wha
 | Status page looks fine but nothing arrives | Either the Meta app is not Live yet (step 11), or the callback URL in Meta is not the one the Status page shows now. It changes if your Twenty address changes. Redo step 9 |
 | Every enquiry creates a duplicate contact | The form collects neither email nor phone number, so Twenty has nothing to match on. See step 3 |
 | The lead is in Meta but not in Twenty | Wait an hour. Twenty rechecks your forms every hour and picks up anything it missed |
+| Connect says permissions are missing | Redo step 7, points 4 to 6, ticking every permission it names, then paste the new User token |
+| Connect says the token gives access to no Page | In the blue window of step 7, point 6, your Page was not ticked. Generate the token again and tick it |
+| Connect cannot exchange the token, mentioning the client secret | The Meta app secret in Twenty belongs to a different app from the one chosen in the Graph API Explorer. Check both |
 
 Leads older than 90 days cannot be recovered. Meta deletes them and does not give them to anyone.
 
 ## Appendix A. If your token shows an expiry date
+
+> **Used the Connect button?** Skip this appendix. The token Connect gives you never expires.
 
 Only needed if the Access Token Debugger in step 7 showed a date next to **Expires** instead of **Never**. This part asks you to paste two addresses into the Graph API Explorer. If that feels uncomfortable, hand this appendix to whoever installed the app.
 
@@ -292,4 +329,4 @@ A token made this way keeps working indefinitely. It does stop if you change you
 - **Send a test lead**: needs Node.js and curl, and is run from the app's source folder. The form ID is on the form's record under **Lead Ads**, then **Lead forms**, and each custom question's key is in its **Question details** field. Run `META_PAGE_TOKEN=<page token> META_FORM_ID=<form id> scripts/create-test-lead.sh "Jane Doe" jane@example.com "+14155550123"`, adding `question_key=answer` for each custom question. The Meta app must be Live (step 11). It replaces the form's single test lead and produces a readable lead, unlike Meta's Lead Ads Testing Tool. Give every field a real value: an empty test lead carries placeholder text that Twenty rejects as a phone number.
 - **Import older leads**: run the `meta-backfill-leads` function from **Settings**, then **Applications**, then **Meta Leads**, then **Content**, pick the function and use the **Test** tab. It imports everything Meta still holds, up to 90 days.
 - **Hourly catch-up**: `meta-reconcile-leads` runs every hour and re-reads recent leads, so an outage does not lose anything.
-- **Behind a tunnel**: the callback URL on the Status page is built from the workspace address, so on a laptop behind a tunnel it shows the local address rather than the tunnel one. Paste the tunnel address into Meta instead.
+- **Behind a tunnel**: the callback URL on the Status page is built from the workspace address, so on a laptop behind a tunnel it shows the local address rather than the tunnel one. Paste the tunnel address into Meta instead. The Connect button has a field for it under **Behind a tunnel?**.

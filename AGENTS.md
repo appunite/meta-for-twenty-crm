@@ -18,6 +18,7 @@ Meta --POST leadgen--> meta-webhook-receive (public route /s/meta/leadgen)
                          verify X-Hub-Signature-256 against the raw body
                          enqueue one meta-process-lead job per lead (jobId = leadgenId)
 Meta --GET verify----> meta-webhook-verify: check hub.verify_token, echo hub.challenge
+                         accepts META_VERIFY_TOKEN and HMAC-SHA256(META_APP_SECRET, "meta-leads-verify")
 
 meta-process-lead (queued job)
   skip if the MetaLead is already PROCESSED
@@ -33,7 +34,9 @@ meta-reconcile-leads (cron, hourly) and meta-backfill-leads (manual)
 
 Webhook, reconcile and backfill feed one idempotent pipeline keyed on `leadgenId`. Reconcile starts one hour before each form's `lastSyncedAt` cursor and never further back than 90 days, which is how long Meta keeps lead data. Backfill ignores the cursor.
 
-`meta-connection-status` (GET `/s/meta/status`, auth required) reports which variables are set and whether the Page is reachable, subscribed to `leadgen` and has forms. The Status page (`src/front-components/main-page.tsx`) renders it together with the callback URL and recent failures.
+`meta-connect` (POST `/s/meta/connect`, auth required) takes a Meta User token pasted on the Status page: `debug_token` checks it and yields the app ID, it is exchanged for a long-lived token, `me/accounts` gives the Page and its never-expiring token, then it registers the app webhook with the derived verify token and subscribes the Page to `leadgen`. It saves nothing: the Page token and Page ID are returned for the user to paste into Settings. Saving them would need the broad `APPLICATIONS` permission flag, which also covers installing and uninstalling apps.
+
+`meta-connection-status` (GET `/s/meta/status`, auth required) reports which variables are set and whether the Page is reachable, subscribed to `leadgen` and has forms. The Status page (`src/front-components/main-page.tsx`) renders it together with the callback URL, the Connect form and recent failures.
 
 ## Code layout
 
@@ -54,7 +57,7 @@ src/
 scripts/create-test-lead.sh    creates a readable Meta test lead through the Graph API
 ```
 
-Two seams keep the logic testable: `MetaGraphClient` (`meta-client/meta-graph-client.ts`) and `LeadRepository` / `FormRepository` (`twenty-client/`). Unit tests use the in-memory repositories in `src/__tests__/utils/` and stub the graph client. Logic functions stay thin; put behaviour in `utils/` with a spec next to it in `utils/__tests__/`.
+Three seams keep the logic testable: `MetaGraphClient` (`meta-client/meta-graph-client.ts`, Page token fixed at construction), `MetaSetupClient` (`meta-client/meta-setup-client.ts`, per-call tokens and POSTs, used only by connect) and `LeadRepository` / `FormRepository` (`twenty-client/`). Unit tests use the in-memory repositories in `src/__tests__/utils/` and stub the graph client. Logic functions stay thin; put behaviour in `utils/` with a spec next to it in `utils/__tests__/`.
 
 ## Configuration
 
@@ -63,7 +66,7 @@ Application variables, set per workspace in Settings, Applications, Meta Leads:
 | Key | Secret | Use |
 |---|---|---|
 | `META_APP_SECRET` | yes | HMAC key for webhook signatures |
-| `META_VERIFY_TOKEN` | yes | Webhook verification handshake |
+| `META_VERIFY_TOKEN` | yes | Webhook verification handshake. Optional: a token derived from the app secret is always accepted |
 | `META_PAGE_ACCESS_TOKEN` | yes | Graph API calls. Without it every call fails with "not configured" |
 | `META_PAGE_ID` | no | The Page whose forms are synced |
 

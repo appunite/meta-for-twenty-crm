@@ -45,6 +45,15 @@ describe('connectionIssues', () => {
     ]);
   });
 
+  it('does not ask for a verify token when the app secret is set', () => {
+    expect(
+      connectionIssues({
+        variables: { ...ALL_SET, verifyToken: false },
+        page: null,
+      }),
+    ).toEqual([]);
+  });
+
   it('prefers the hint over the raw error', () => {
     const status: ConnectionStatus = {
       variables: ALL_SET,

@@ -13,7 +13,7 @@ describe('checkVerifyChallenge', () => {
           'hub.verify_token': VERIFY_TOKEN,
           'hub.challenge': '1158201444',
         },
-        verifyToken: VERIFY_TOKEN,
+        acceptedTokens: [VERIFY_TOKEN],
       }),
     ).toEqual({ status: 200, body: '1158201444' });
   });
@@ -26,7 +26,7 @@ describe('checkVerifyChallenge', () => {
           'hub.verify_token': 'guess',
           'hub.challenge': '1158201444',
         },
-        verifyToken: VERIFY_TOKEN,
+        acceptedTokens: [VERIFY_TOKEN],
       }).status,
     ).toBe(403);
   });
@@ -39,7 +39,7 @@ describe('checkVerifyChallenge', () => {
           'hub.verify_token': VERIFY_TOKEN,
           'hub.challenge': '1158201444',
         },
-        verifyToken: VERIFY_TOKEN,
+        acceptedTokens: [VERIFY_TOKEN],
       }).status,
     ).toBe(403);
   });
@@ -48,7 +48,7 @@ describe('checkVerifyChallenge', () => {
     expect(
       checkVerifyChallenge({
         query: { 'hub.mode': 'subscribe', 'hub.verify_token': VERIFY_TOKEN },
-        verifyToken: VERIFY_TOKEN,
+        acceptedTokens: [VERIFY_TOKEN],
       }).status,
     ).toBe(400);
   });
@@ -61,8 +61,34 @@ describe('checkVerifyChallenge', () => {
           'hub.verify_token': '',
           'hub.challenge': '1158201444',
         },
-        verifyToken: '',
+        acceptedTokens: [''],
       }).status,
     ).toBe(403);
+  });
+
+  it('rejects everything when no token is accepted', () => {
+    expect(
+      checkVerifyChallenge({
+        query: {
+          'hub.mode': 'subscribe',
+          'hub.verify_token': 'anything',
+          'hub.challenge': '1158201444',
+        },
+        acceptedTokens: [],
+      }).status,
+    ).toBe(403);
+  });
+
+  it('accepts any of several tokens', () => {
+    expect(
+      checkVerifyChallenge({
+        query: {
+          'hub.mode': 'subscribe',
+          'hub.verify_token': 'derived-token',
+          'hub.challenge': '1158201444',
+        },
+        acceptedTokens: [VERIFY_TOKEN, 'derived-token'],
+      }),
+    ).toEqual({ status: 200, body: '1158201444' });
   });
 });

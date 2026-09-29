@@ -19,6 +19,11 @@ export default defineApplication({
   author: 'Appunite',
   category: 'Marketing',
   logo: 'public/logo.svg',
+  galleryImages: [
+    'public/status_page.png',
+    'public/meta_leads.png',
+    'public/meta_lead_forms.png',
+  ],
   emailSupport: 'hello@appunite.com',
   issueReportUrl: 'https://github.com/twentyhq/twenty/discussions/23921',
   applicationVariables: {
@@ -33,7 +38,7 @@ export default defineApplication({
       universalIdentifier: META_VERIFY_TOKEN_VARIABLE_UNIVERSAL_IDENTIFIER,
       label: 'Webhook verify token',
       description:
-        'Any random string. Paste the same value as the verify token in the Meta app webhook settings.',
+        'Optional. Leave empty if you use Connect on the Status page. Otherwise any random string, pasted as the verify token in the Meta app webhook settings.',
       isSecret: true,
     },
     META_PAGE_ACCESS_TOKEN: {
